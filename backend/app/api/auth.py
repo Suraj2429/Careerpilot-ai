@@ -6,7 +6,7 @@ from app.models.user import User
 from app.schemas.auth import UserLogin, UserRegister
 from app.utils.password import hash_password, verify_password
 from app.core.security import create_access_token
-
+from app.models.role import UserRole
 
 router = APIRouter(
     prefix="/api/auth",
@@ -38,7 +38,7 @@ def register_user(
         name=user_data.name,
         email=user_data.email,
         password=hash_password(user_data.password),
-        role="student"
+        role=UserRole.STUDENT.value
     )
 
     db.add(new_user)

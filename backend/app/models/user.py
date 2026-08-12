@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
+from app.models.role import UserRole
 
 
 class User(Base):
@@ -33,7 +34,7 @@ class User(Base):
 
     role: Mapped[str] = mapped_column(
         String(20),
-        default="student",
+        default=UserRole.STUDENT.value,
         nullable=False
     )
 
