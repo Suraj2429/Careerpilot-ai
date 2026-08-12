@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.api.auth import router as auth_router
+from app.database.base import Base
 from app.database.connection import engine
+from app.models.user import User
 
 
 app = FastAPI(
@@ -9,6 +12,12 @@ app = FastAPI(
     description="AI-powered Career Guidance and Internship Recommendation Platform",
     version="1.0.0"
 )
+
+
+Base.metadata.create_all(bind=engine)
+
+
+app.include_router(auth_router)
 
 
 @app.get("/")
