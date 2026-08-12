@@ -10,7 +10,7 @@ from app.schemas.response import (
 )
 from app.utils.password import hash_password, verify_password
 from app.core.security import create_access_token
-
+from app.exception.exceptions import AppException
 
 router = APIRouter(
     prefix="/api/auth",
@@ -35,9 +35,9 @@ def register_user(
     )
 
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email is already registered"
+        raise AppException(
+            message="Email is already registered",
+            status_code=status.HTTP_409_CONFLICT
         )
 
     new_user = User(
@@ -77,21 +77,20 @@ def login_user(
     )
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+        raise AppException(
+            message="Invalid email or password",
+            status_code=status.HTTP_401_UNAUTHORIZED
         )
 
     if not verify_password(
         user_data.password,
         user.password
     ):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+        raise AppException(
+            message="Invalid email or password",
+            status_code=status.HTTP_401_UNAUTHORIZED
         )
-
-    access_token = create_access_token(
+        access_token = create_access_token(
         {
             "sub": str(user.id),
             "role": user.role

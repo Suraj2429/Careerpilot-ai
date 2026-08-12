@@ -7,6 +7,8 @@ from app.database.connection import engine
 from app.models.user import User
 from app.api.users import router as users_router
 from app.api.admin import router as admin_router
+from app.exception.exceptions import AppException
+from app.exception.handlers import app_exception_handler
 
 app = FastAPI(
     title="CareerPilot AI",
@@ -14,6 +16,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_exception_handler(
+    AppException,
+    app_exception_handler
+)
 
 Base.metadata.create_all(bind=engine)
 
