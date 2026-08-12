@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.core.security import JWT_ALGORITHM, JWT_SECRET_KEY
+from app.core.config import settings
 from app.database.dependency import get_db
 from app.models.user import User
 
@@ -21,8 +21,8 @@ def get_current_user(
     try:
         payload = jwt.decode(
             token,
-            JWT_SECRET_KEY,
-            algorithms=[JWT_ALGORITHM]
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM]
         )
 
         user_id = payload.get("sub")

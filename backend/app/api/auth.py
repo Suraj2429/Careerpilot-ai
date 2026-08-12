@@ -1,16 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.core.security import create_access_token
 from app.database.dependency import get_db
+from app.exception.exceptions import AppException
+from app.models.role import UserRole
 from app.models.user import User
 from app.schemas.auth import UserLogin, UserRegister
-from app.schemas.response import (
-    LoginResponse,
-    RegisterResponse
-)
+from app.schemas.response import LoginResponse, RegisterResponse
 from app.utils.password import hash_password, verify_password
-from app.core.security import create_access_token
-from app.exception.exceptions import AppException
+
 
 router = APIRouter(
     prefix="/api/auth",
@@ -18,7 +17,8 @@ router = APIRouter(
 )
 
 
-# User Registration and Login Endpoints
+# User Registration
+
 @router.post(
     "/register",
     response_model=RegisterResponse,
@@ -62,6 +62,8 @@ def register_user(
     }
 
 
+# User Login
+
 @router.post(
     "/login",
     response_model=LoginResponse
@@ -90,7 +92,9 @@ def login_user(
             message="Invalid email or password",
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-        access_token = create_access_token(
+
+    # Generate JWT after successful password verification
+    access_token = create_access_token(
         {
             "sub": str(user.id),
             "role": user.role
