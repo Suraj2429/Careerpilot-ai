@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "./api/axios";
+import Register from "./auth/Register";
 
 function App() {
   const [status, setStatus] = useState("Checking backend...");
@@ -23,8 +24,7 @@ function App() {
 
   return (
     <div>
-      <h1>CareerPilot AI</h1>
-      <p>{status}</p>
+      <Register />
     </div>
   );
 }
