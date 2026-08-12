@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "./api/axios";
 import Register from "./auth/Register";
+import Login from "./auth/Login";
 
 function App() {
   const [status, setStatus] = useState("Checking backend...");
@@ -25,7 +26,9 @@ function App() {
   return (
     <div>
       <Register />
+      <Login />
     </div>
+
   );
 }
 
