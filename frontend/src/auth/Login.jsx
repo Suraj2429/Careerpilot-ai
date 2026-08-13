@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
 
@@ -8,9 +9,10 @@ function Login() {
     password: "",
   });
 
-  const [user, setUser] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { user, login } = useAuth();
 
 
   const handleChange = (event) => {
@@ -27,7 +29,6 @@ function Login() {
     event.preventDefault();
 
     setError("");
-    setUser(null);
     setLoading(true);
 
     try {
@@ -36,28 +37,13 @@ function Login() {
         formData
       );
 
-      const { access_token } = response.data;
-
-      localStorage.setItem(
-        "access_token",
-        access_token
-      );
-
-      const profileResponse = await api.get(
-        "/api/users/me",
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
-
-      setUser(profileResponse.data);
+      await login(response.data.access_token);
 
       setFormData({
         email: "",
         password: "",
       });
+
     } catch (error) {
       if (error.response?.data?.message) {
         setError(error.response.data.message);
@@ -73,72 +59,129 @@ function Login() {
 
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="auth-page">
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">
-            Email
-          </label>
+      <div className="auth-card">
 
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password">
-            Password
-          </label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            minLength={8}
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-
-      {error && (
-        <p>
-          {error}
-        </p>
-      )}
-
-      {user && (
-        <div>
-          <h3>Login successful</h3>
+        <div className="auth-header">
+          <h1>CareerPilot AI</h1>
 
           <p>
-            Welcome, {user.name}
-          </p>
-
-          <p>
-            Email: {user.email}
-          </p>
-
-          <p>
-            Role: {user.role}
+            AI-powered career guidance for students
           </p>
         </div>
-      )}
+
+
+        {!user ? (
+          <>
+            <div className="auth-title">
+              <h2>Welcome Back</h2>
+
+              <p>
+                Login to continue your career journey
+              </p>
+            </div>
+
+
+            <form
+              className="auth-form"
+              onSubmit={handleSubmit}
+            >
+
+              <div className="form-group">
+                <label htmlFor="email">
+                  Email
+                </label>
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+
+              <div className="form-group">
+                <label htmlFor="password">
+                  Password
+                </label>
+
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  minLength={8}
+                  required
+                />
+              </div>
+
+
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+
+
+              <button
+                className="auth-button"
+                type="submit"
+                disabled={loading}
+              >
+                {loading
+                  ? "Logging in..."
+                  : "Login"}
+              </button>
+
+            </form>
+
+
+            <div className="auth-footer">
+              <p>
+                Don't have an account?{" "}
+                <a href="/register">
+                  Create account
+                </a>
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="login-success">
+
+            <div className="success-icon">
+              ✓
+            </div>
+
+            <h2>Login Successful</h2>
+
+            <p>
+              Welcome, <strong>{user.name}</strong>
+            </p>
+
+            <div className="user-info">
+              <p>
+                <strong>Email:</strong>{" "}
+                {user.email}
+              </p>
+
+              <p>
+                <strong>Role:</strong>{" "}
+                {user.role}
+              </p>
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
     </div>
   );
 }
