@@ -11,6 +11,9 @@ from app.database.connection import engine
 from app.exception.exceptions import AppException
 from app.exception.handlers import app_exception_handler
 from app.models.user import User
+from app.models.student_profile import StudentProfile
+from app.api.profile import router as profile_router
+
 
 app = FastAPI(
     title="CareerPilot AI",
@@ -37,6 +40,10 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(admin_router)
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(admin_router)
+app.include_router(profile_router)
 
 @app.get("/")
 def root():
