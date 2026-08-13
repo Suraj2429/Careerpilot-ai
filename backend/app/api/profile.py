@@ -106,3 +106,52 @@ def get_profile(
         "interests": profile.interests,
         "career_goals": profile.career_goals,
     }
+
+@router.put(
+    "",
+    response_model=StudentProfileResponse,
+)
+def update_profile(
+    profile_data: StudentProfileCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    profile = (
+        db.query(StudentProfile)
+        .filter(
+            StudentProfile.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not profile:
+        profile = StudentProfile(
+            user_id=current_user.id,
+            college=profile_data.college,
+            education_level=profile_data.education_level,
+            skills=profile_data.skills,
+            interests=profile_data.interests,
+            career_goals=profile_data.career_goals,
+        )
+
+        db.add(profile)
+
+    else:
+        profile.college = profile_data.college
+        profile.education_level = profile_data.education_level
+        profile.skills = profile_data.skills
+        profile.interests = profile_data.interests
+        profile.career_goals = profile_data.career_goals
+
+    db.commit()
+    db.refresh(profile)
+
+    return {
+        "id": profile.id,
+        "user_id": profile.user_id,
+        "college": profile.college,
+        "education_level": profile.education_level,
+        "skills": profile.skills,
+        "interests": profile.interests,
+        "career_goals": profile.career_goals,
+    }
